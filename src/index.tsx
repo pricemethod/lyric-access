@@ -7,17 +7,29 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-
+import { BleManager } from 'react-native-ble-plx';
 type AppProps = {
   modalVisible: boolean;
   setModalVisible: (b: boolean) => void;
 };
 
+var bleManager = new BleManager();
+
 const LyricAccessModal = ({ modalVisible, setModalVisible }: AppProps) => {
   const [isConnected, setIsConnected] = useState(false);
 
   if (!isConnected && modalVisible) {
-    // TODO
+    bleManager.startDeviceScan(null, null, (error, device) => {
+      if (error || !device) {
+        console.warn('Device not found.');
+        console.warn(error);
+        return;
+      }
+
+      bleManager.stopDeviceScan();
+
+      console.log(`Found device: ${device.name} (${device.id})...`);
+    });
   }
 
   return (

@@ -20,6 +20,7 @@ def flipper_post_install(installer)
   end
 end
 
+
 target 'LyricAccessExample' do
   # Pods for LyricAccessExample
   pod 'FBLazyVector', :path => "../node_modules/react-native/Libraries/FBLazyVector"
