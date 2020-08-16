@@ -26,3 +26,5 @@ return (
   />
 );
 ```
+
+When this modal becomes visible, the app will connect to the lock via Bluetooth LE. Upon a successful connection, the spinner will turn into an "Unlock" button. When the user taps the unlock button, the associated keypad code will be sent to the lock.
