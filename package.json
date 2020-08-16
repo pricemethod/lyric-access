@@ -1,6 +1,6 @@
 {
   "name": "lyric-access",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A package to integrate the access solution from Lyric.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -34,13 +34,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/zain/lyric-access",
+  "repository": "https://github.com/pricemethod/lyric-access",
   "author": "Zain Memon <zain@lyric.com> (https://github.com/zain)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zain/lyric-access/issues"
+    "url": "https://github.com/pricemethod/lyric-access/issues"
   },
-  "homepage": "https://github.com/zain/lyric-access#readme",
+  "homepage": "https://github.com/pricemethod/lyric-access#readme",
   "devDependencies": {
     "@commitlint/config-conventional": "^8.3.4",
     "@react-native-community/bob": "^0.16.2",
