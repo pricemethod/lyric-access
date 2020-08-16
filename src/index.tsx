@@ -7,18 +7,50 @@ import {
   TouchableHighlight,
   View,
 } from 'react-native';
-import { BleManager } from 'react-native-ble-plx';
+import { BleManager, Device, LogLevel } from 'react-native-ble-plx';
+import { Buffer } from 'buffer';
+
 type AppProps = {
   modalVisible: boolean;
   setModalVisible: (b: boolean) => void;
+  lockName: string;
 };
 
 var bleManager = new BleManager();
+bleManager.setLogLevel(LogLevel.Verbose);
 
-const LyricAccessModal = ({ modalVisible, setModalVisible }: AppProps) => {
+const LyricAccessModal = ({
+  modalVisible,
+  setModalVisible,
+  lockName,
+}: AppProps) => {
   const [isConnected, setIsConnected] = useState(false);
+  const [connectedDevice, setConnectedDevice] = useState<Device | undefined>(
+    undefined
+  );
 
-  if (!isConnected && modalVisible) {
+  function cleanup() {
+    // if (connectedDevice !== undefined)
+    //   bleManager.cancelDeviceConnection(connectedDevice.id);
+    console.log('Cleaning up BLE stack...');
+    bleManager.destroy();
+    bleManager = new BleManager();
+    setConnectedDevice(undefined);
+    setIsConnected(false);
+  }
+
+  function sendUnlockPayload(device: Device) {
+    let payload = Buffer.from('010203040506FFFF', 'hex').toString('base64');
+    console.log('Sending: ' + payload);
+    bleManager.writeCharacteristicWithoutResponseForDevice(
+      device.id,
+      '4c797269-635f-4c6f-636b-5f5f5f5f5f5f', // lyric service uuid
+      '4c797269-635f-4c6f-636b-5f5f5f303031', // 'lock' characteristic uuid
+      payload
+    );
+  }
+
+  function scanAndConnect() {
     bleManager.startDeviceScan(null, null, (error, device) => {
       if (error || !device) {
         console.warn('Device not found.');
@@ -26,21 +58,52 @@ const LyricAccessModal = ({ modalVisible, setModalVisible }: AppProps) => {
         return;
       }
 
-      bleManager.stopDeviceScan();
-
       console.log(`Found device: ${device.name} (${device.id})...`);
+
+      if (device.name == lockName) {
+        bleManager.stopDeviceScan();
+        setIsConnected(true);
+
+        device
+          .connect()
+          .then((device) => {
+            return device.discoverAllServicesAndCharacteristics();
+          })
+          .then((device) => {
+            console.log(`Connected to device: ${device.name}`);
+            setConnectedDevice(device);
+          });
+      }
     });
+  }
+
+  if (!isConnected && modalVisible) {
+    scanAndConnect();
   }
 
   return (
     <Modal animationType="slide" transparent={false} visible={modalVisible}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          {isConnected ? (
+          {isConnected && connectedDevice !== undefined ? (
             <TouchableHighlight
               style={{ ...styles.openButton, backgroundColor: '#283245' }}
               onPress={() => {
-                setIsConnected(false);
+                if (connectedDevice === undefined) {
+                  scanAndConnect();
+                  // todo: send unlock payload
+                } else {
+                  bleManager
+                    .isDeviceConnected(connectedDevice.id)
+                    .then((isStillConnected) => {
+                      if (isStillConnected) {
+                        sendUnlockPayload(connectedDevice);
+                      } else {
+                        scanAndConnect();
+                        // todo: send unlock payload
+                      }
+                    });
+                }
               }}
             >
               <Text style={styles.textStyle}>Unlock</Text>
@@ -54,7 +117,8 @@ const LyricAccessModal = ({ modalVisible, setModalVisible }: AppProps) => {
           <TouchableHighlight
             style={{ ...styles.openButton, backgroundColor: '#283245' }}
             onPress={() => {
-              setModalVisible(!modalVisible);
+              cleanup();
+              setModalVisible(false);
             }}
           >
             <Text style={styles.textStyle}>Close</Text>

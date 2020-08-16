@@ -15,6 +15,7 @@ export default function App() {
       <LyricAccessModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
+        lockName={'Boron-DRWLC9'}
       />
     </View>
   );
