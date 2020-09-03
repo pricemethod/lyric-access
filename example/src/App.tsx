@@ -15,7 +15,8 @@ export default function App() {
       <LyricAccessModal
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
-        lockName={''}
+        lockName={'Ly000003'}
+        keypadCode={'111111'}
       />
     </View>
   );

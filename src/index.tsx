@@ -14,6 +14,7 @@ type AppProps = {
   modalVisible: boolean;
   setModalVisible: (b: boolean) => void;
   lockName: string;
+  keypadCode: string;
 };
 
 var bleManager = new BleManager();
@@ -23,6 +24,7 @@ const LyricAccessModal = ({
   modalVisible,
   setModalVisible,
   lockName,
+  keypadCode,
 }: AppProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [connectedDevice, setConnectedDevice] = useState<Device | undefined>(
@@ -39,8 +41,18 @@ const LyricAccessModal = ({
     setIsConnected(false);
   }
 
-  function sendUnlockPayload(device: Device) {
-    let payload = Buffer.from('000501010503FFFF', 'hex').toString('base64');
+  function sendUnlockPayload(device: Device, keypadCode: string) {
+    // convert code from 051153 -> '000501010503FFFF'
+    let bufferizedCode = '';
+    for (let n of keypadCode) {
+      bufferizedCode += '0' + n;
+    }
+
+    while (bufferizedCode.length < 16) {
+      bufferizedCode += 'F';
+    }
+
+    let payload = Buffer.from(bufferizedCode, 'hex').toString('base64');
     console.log('Sending: ' + payload);
     bleManager.writeCharacteristicWithoutResponseForDevice(
       device.id,
@@ -51,7 +63,7 @@ const LyricAccessModal = ({
   }
 
   function scanAndConnect() {
-    console.log(`Looking for ${lockName}`);
+    console.log(`Looking for: ${lockName}`);
     bleManager.startDeviceScan(
       ['4c797269-635f-4c6f-636b-5f5f5f5f5f5f'],
       null,
@@ -110,7 +122,7 @@ const LyricAccessModal = ({
                     .isDeviceConnected(connectedDevice.id)
                     .then((isStillConnected) => {
                       if (isStillConnected) {
-                        sendUnlockPayload(connectedDevice);
+                        sendUnlockPayload(connectedDevice, keypadCode);
                       } else {
                         scanAndConnect();
                         // todo: send unlock payload
