@@ -8,6 +8,8 @@ A package to integrate the access solution from Lyric into a React Native applic
 npm install lyric-access
 ```
 
+In addition, you need to follow the installation instructions for react-native-ble-plx [here](https://github.com/Polidea/react-native-ble-plx/blob/master/docs/README_V1.md#configuration--installation).
+
 ## Usage
 
 This package provides a modal component that handles connecting to a particular lock and sending a code to it. Here's how to use it:
