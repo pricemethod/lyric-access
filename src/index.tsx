@@ -80,11 +80,11 @@ const LyricAccessModal = ({
         console.log(` \\_ localName: ${device.localName}`);
         console.log(` \\_ serviceUUIDs: ${device.serviceUUIDs}`);
 
-        // if (device.name == lockName) {
-        if (
-          device.serviceUUIDs &&
-          device.serviceUUIDs.includes('4c797269-635f-4c6f-636b-5f5f5f5f5f5f')
-        ) {
+        if (device.localName == lockName) {
+          // if (
+          //   device.serviceUUIDs &&
+          //   device.serviceUUIDs.includes('4c797269-635f-4c6f-636b-5f5f5f5f5f5f')
+          // ) {
           bleManager.stopDeviceScan();
           setIsConnected(true);
 
