@@ -67,7 +67,6 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - MultiplatformBleAdapter (0.1.6)
   - OpenSSL-Universal (1.0.2.19):
     - OpenSSL-Universal/Static (= 1.0.2.19)
   - OpenSSL-Universal/Static (1.0.2.19)
@@ -234,9 +233,10 @@ PODS:
     - React-cxxreact (= 0.62.2)
     - React-jsi (= 0.62.2)
   - React-jsinspector (0.62.2)
-  - react-native-ble-plx (2.0.1):
-    - MultiplatformBleAdapter (= 0.1.6)
+  - react-native-ble-plx (1.1.1):
     - React
+    - react-native-ble-plx-swift
+  - react-native-ble-plx-swift (1.1.1)
   - React-RCTActionSheet (0.62.2):
     - React-Core/RCTActionSheetHeaders (= 0.62.2)
   - React-RCTAnimation (0.62.2):
@@ -323,6 +323,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-ble-plx (from `../node_modules/react-native-ble-plx`)
+  - react-native-ble-plx-swift (from `../node_modules/react-native-ble-plx`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -348,7 +349,6 @@ SPEC REPOS:
     - Flipper-PeerTalk
     - Flipper-RSocket
     - FlipperKit
-    - MultiplatformBleAdapter
     - OpenSSL-Universal
     - YogaKit
 
@@ -382,6 +382,8 @@ EXTERNAL SOURCES:
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-ble-plx:
+    :path: "../node_modules/react-native-ble-plx"
+  react-native-ble-plx-swift:
     :path: "../node_modules/react-native-ble-plx"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
@@ -422,7 +424,6 @@ SPEC CHECKSUMS:
   FlipperKit: 6dc9b8f4ef60d9e5ded7f0264db299c91f18832e
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  MultiplatformBleAdapter: 652f47ecd7f5036756517cf66833210709a72eab
   OpenSSL-Universal: 8b48cc0d10c1b2923617dfe5c178aa9ed2689355
   RCTRequired: cec6a34b3ac8a9915c37e7e4ad3aa74726ce4035
   RCTTypeSafety: 93006131180074cffa227a1075802c89a49dd4ce
@@ -433,7 +434,8 @@ SPEC CHECKSUMS:
   React-jsi: b6dc94a6a12ff98e8877287a0b7620d365201161
   React-jsiexecutor: 1540d1c01bb493ae3124ed83351b1b6a155db7da
   React-jsinspector: 512e560d0e985d0e8c479a54a4e5c147a9c83493
-  react-native-ble-plx: d8dcca81ecc617eda824a4ace85f7ffd55d90c6c
+  react-native-ble-plx: 304c7bee074a05581672c9990f375b3906808718
+  react-native-ble-plx-swift: eb64f02b988becb84a60164aba9fab5d6ddb6dc8
   React-RCTActionSheet: f41ea8a811aac770e0cc6e0ad6b270c644ea8b7c
   React-RCTAnimation: 49ab98b1c1ff4445148b72a3d61554138565bad0
   React-RCTBlob: a332773f0ebc413a0ce85942a55b064471587a71
@@ -447,6 +449,6 @@ SPEC CHECKSUMS:
   Yoga: 3ebccbdd559724312790e7742142d062476b698e
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 3a23b1847e86b50e6317c97e028d2be7f59b82ba
+PODFILE CHECKSUM: 135bfac3da1349aecaaad2f1ebafc349e490320c
 
 COCOAPODS: 1.9.1
