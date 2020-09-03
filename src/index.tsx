@@ -40,7 +40,7 @@ const LyricAccessModal = ({
   }
 
   function sendUnlockPayload(device: Device) {
-    let payload = Buffer.from('010203040506FFFF', 'hex').toString('base64');
+    let payload = Buffer.from('000501010503FFFF', 'hex').toString('base64');
     console.log('Sending: ' + payload);
     bleManager.writeCharacteristicWithoutResponseForDevice(
       device.id,
@@ -51,30 +51,43 @@ const LyricAccessModal = ({
   }
 
   function scanAndConnect() {
-    bleManager.startDeviceScan(null, null, (error, device) => {
-      if (error || !device) {
-        console.warn('Device not found.');
-        console.warn(error);
-        return;
+    console.log(`Looking for ${lockName}`);
+    bleManager.startDeviceScan(
+      ['4c797269-635f-4c6f-636b-5f5f5f5f5f5f'],
+      null,
+      (error, device) => {
+        if (error || !device) {
+          console.warn('Device not found.');
+          console.warn(error);
+          return;
+        }
+
+        if (device.name == 'Zain’s MacBook Pro') return;
+
+        console.log(`Found device: ${device.name} (${device.id})...`);
+        console.log(` \\_ localName: ${device.localName}`);
+        console.log(` \\_ serviceUUIDs: ${device.serviceUUIDs}`);
+
+        // if (device.name == lockName) {
+        if (
+          device.serviceUUIDs &&
+          device.serviceUUIDs.includes('4c797269-635f-4c6f-636b-5f5f5f5f5f5f')
+        ) {
+          bleManager.stopDeviceScan();
+          setIsConnected(true);
+
+          device
+            .connect()
+            .then((device) => {
+              return device.discoverAllServicesAndCharacteristics();
+            })
+            .then((device) => {
+              console.log(`Connected to device: ${device.name}`);
+              setConnectedDevice(device);
+            });
+        }
       }
-
-      console.log(`Found device: ${device.name} (${device.id})...`);
-
-      if (device.name == lockName) {
-        bleManager.stopDeviceScan();
-        setIsConnected(true);
-
-        device
-          .connect()
-          .then((device) => {
-            return device.discoverAllServicesAndCharacteristics();
-          })
-          .then((device) => {
-            console.log(`Connected to device: ${device.name}`);
-            setConnectedDevice(device);
-          });
-      }
-    });
+    );
   }
 
   if (!isConnected && modalVisible) {
