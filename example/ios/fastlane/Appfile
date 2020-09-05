@@ -1,0 +1,8 @@
+app_identifier("com.lyric.locks") # The bundle identifier of your app
+apple_id("zain@inzain.net") # Your Apple email address
+
+itc_team_id("11045") # App Store Connect Team ID
+team_id("38Z38N5L9F") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
