@@ -66,6 +66,14 @@ const LyricAccessModal = ({
 
   function scanAndConnect() {
     console.log(`Looking for: ${lockName}`);
+    // show keypad code after 5s if not connected
+    let timeOutTimer = setTimeout(() => {
+      console.log(`Timed out. isConnected: ${isConnected}`);
+      if (!isConnected) {
+        setTimedOut(true);
+      }
+    }, 5000);
+
     bleManager.startDeviceScan(
       ['4c797269-635f-4c6f-636b-5f5f5f5f5f5f'],
       null,
@@ -83,16 +91,17 @@ const LyricAccessModal = ({
         console.log(` \\_ serviceUUIDs: ${device.serviceUUIDs}`);
 
         if (device.localName == lockName) {
-          // if (
-          //   device.serviceUUIDs &&
-          //   device.serviceUUIDs.includes('4c797269-635f-4c6f-636b-5f5f5f5f5f5f')
-          // ) {
+          console.log('Connecting...');
+
           bleManager.stopDeviceScan();
+          clearTimeout(timeOutTimer);
           setIsConnected(true);
+          setTimedOut(false);
 
           device
             .connect()
             .then((device) => {
+              console.log('Discovering...');
               return device.discoverAllServicesAndCharacteristics();
             })
             .then((device) => {
@@ -106,14 +115,6 @@ const LyricAccessModal = ({
 
   if (!isConnected && modalVisible) {
     scanAndConnect();
-
-    // show keypad code after 5s if not connected
-    setInterval(() => {
-      if (!isConnected) {
-        cleanup();
-        setTimedOut(true);
-      }
-    }, 5000);
   }
 
   let spinner = <ActivityIndicator size="large" />;
@@ -154,20 +155,22 @@ const LyricAccessModal = ({
     </TouchableHighlight>
   );
 
+  let keypadCodeDisplay = (
+    <>
+      <Text>Lock code</Text>
+      <Text style={styles.keypadCode}>{keypadCode}</Text>
+    </>
+  );
+
   let unlockContent;
-  if (!timedOut) {
-    if (isConnected && connectedDevice !== undefined) {
-      unlockContent = unlockButton;
+  if (isConnected && connectedDevice !== undefined) {
+    unlockContent = unlockButton;
+  } else {
+    if (timedOut) {
+      unlockContent = keypadCodeDisplay;
     } else {
       unlockContent = spinner;
     }
-  } else {
-    unlockContent = (
-      <>
-        <Text>Lock code</Text>
-        <Text style={styles.keypadCode}>{keypadCode}</Text>
-      </>
-    );
   }
 
   return (
