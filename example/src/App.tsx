@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderColor: '#CCCCCC',
+    color: '#333',
     borderWidth: 1,
     height: 50,
     fontSize: 25,

@@ -27,6 +27,7 @@ const LyricAccessModal = ({
   keypadCode,
 }: AppProps) => {
   const [isConnected, setIsConnected] = useState(false);
+  const [timedOut, setTimedOut] = useState(false);
   const [connectedDevice, setConnectedDevice] = useState<Device | undefined>(
     undefined
   );
@@ -39,6 +40,7 @@ const LyricAccessModal = ({
     bleManager = new BleManager();
     setConnectedDevice(undefined);
     setIsConnected(false);
+    setTimedOut(false);
   }
 
   function sendUnlockPayload(device: Device, keypadCode: string) {
@@ -104,50 +106,76 @@ const LyricAccessModal = ({
 
   if (!isConnected && modalVisible) {
     scanAndConnect();
+
+    // show keypad code after 5s if not connected
+    setInterval(() => {
+      if (!isConnected) {
+        cleanup();
+        setTimedOut(true);
+      }
+    }, 5000);
+  }
+
+  let spinner = <ActivityIndicator size="large" />;
+  let unlockButton = (
+    <TouchableHighlight
+      style={{ ...styles.openButton, backgroundColor: '#283245' }}
+      onPress={() => {
+        if (connectedDevice === undefined) {
+          scanAndConnect();
+          // todo: send unlock payload
+        } else {
+          bleManager
+            .isDeviceConnected(connectedDevice.id)
+            .then((isStillConnected) => {
+              if (isStillConnected) {
+                sendUnlockPayload(connectedDevice, keypadCode);
+              } else {
+                scanAndConnect();
+                // todo: send unlock payload
+              }
+            });
+        }
+      }}
+    >
+      <Text style={styles.textStyle}>Unlock</Text>
+    </TouchableHighlight>
+  );
+
+  let closeButton = (
+    <TouchableHighlight
+      style={{ ...styles.openButton, backgroundColor: '#283245' }}
+      onPress={() => {
+        cleanup();
+        setModalVisible(false);
+      }}
+    >
+      <Text style={styles.textStyle}>Close</Text>
+    </TouchableHighlight>
+  );
+
+  let unlockContent;
+  if (!timedOut) {
+    if (isConnected && connectedDevice !== undefined) {
+      unlockContent = unlockButton;
+    } else {
+      unlockContent = spinner;
+    }
+  } else {
+    unlockContent = (
+      <>
+        <Text>Lock code</Text>
+        <Text style={styles.keypadCode}>{keypadCode}</Text>
+      </>
+    );
   }
 
   return (
     <Modal animationType="slide" transparent={false} visible={modalVisible}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          {isConnected && connectedDevice !== undefined ? (
-            <TouchableHighlight
-              style={{ ...styles.openButton, backgroundColor: '#283245' }}
-              onPress={() => {
-                if (connectedDevice === undefined) {
-                  scanAndConnect();
-                  // todo: send unlock payload
-                } else {
-                  bleManager
-                    .isDeviceConnected(connectedDevice.id)
-                    .then((isStillConnected) => {
-                      if (isStillConnected) {
-                        sendUnlockPayload(connectedDevice, keypadCode);
-                      } else {
-                        scanAndConnect();
-                        // todo: send unlock payload
-                      }
-                    });
-                }
-              }}
-            >
-              <Text style={styles.textStyle}>Unlock</Text>
-            </TouchableHighlight>
-          ) : (
-            <TouchableHighlight onPress={() => setIsConnected(true)}>
-              <ActivityIndicator size="large" />
-            </TouchableHighlight>
-          )}
-
-          <TouchableHighlight
-            style={{ ...styles.openButton, backgroundColor: '#283245' }}
-            onPress={() => {
-              cleanup();
-              setModalVisible(false);
-            }}
-          >
-            <Text style={styles.textStyle}>Close</Text>
-          </TouchableHighlight>
+          {unlockContent}
+          {closeButton}
         </View>
       </View>
     </Modal>
@@ -187,6 +215,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  keypadCode: {
+    color: '#000',
+    fontSize: 30,
+    fontWeight: '500',
+    marginTop: 2,
   },
 });
 
